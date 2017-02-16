@@ -1,9 +1,17 @@
 // set up the websocket object
 const WebSocket = require('ws');
+// set up the rpio object
+var rpio = require('rpio');
 
 // variable for the websocket, with the websocket server URL
 const ws = new WebSocket('ws://192.168.0.100:3000/cable');
  
+// use Broadcom GPIO pin naming
+rpio.init({mapping: 'gpio'});
+
+// open pin for control
+rpio.open(2, rpio.OUTPUT, rpio.LOW);
+
 // create the channel JSON
 var channel_json = JSON.stringify({channel: 'DevicesChannel'});
 
@@ -45,7 +53,11 @@ ws.on('message', function(data, flags) {
 function handleDeviceMessage(message) {
   if (message.my_message === 'on') {
     console.log('on');
+    // turn pin 2 on
+    rpio.write(2, rpio.HIGH);
   } else if (message.my_message === 'off') {
     console.log('off');
+    // turn pin 2 off
+    rpio.write(2, rpio.LOW);
   }
 }
