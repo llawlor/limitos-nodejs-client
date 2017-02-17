@@ -6,11 +6,21 @@ var rpio = require('rpio');
 // variable for the websocket, with the websocket server URL
 const ws = new WebSocket('ws://192.168.0.100:3000/cable');
  
+// enable i2c
+rpio.init({gpiomem: false});
+
 // use Broadcom GPIO pin naming
 rpio.init({mapping: 'gpio'});
 
+// begin using i2c
+rpio.i2cBegin();
+// set address 0x04
+rpio.i2cSetSlaveAddress(0x04);
+// set baudrate
+rpio.i2cSetBaudRate(9600);
+
 // open pin for control
-rpio.open(2, rpio.OUTPUT, rpio.LOW);
+//rpio.open(2, rpio.OUTPUT, rpio.LOW);
 
 // create the channel JSON
 var channel_json = JSON.stringify({channel: 'DevicesChannel'});
@@ -54,10 +64,12 @@ function handleDeviceMessage(message) {
   if (message.my_message === 'on') {
     console.log('on');
     // turn pin 2 on
-    rpio.write(2, rpio.HIGH);
+    //rpio.write(2, rpio.HIGH);
+    rpio.i2cWrite(new Buffer([0x01]));
   } else if (message.my_message === 'off') {
     console.log('off');
     // turn pin 2 off
-    rpio.write(2, rpio.LOW);
+    //rpio.write(2, rpio.LOW);
+    rpio.i2cWrite(new Buffer([0x02]));
   }
 }
