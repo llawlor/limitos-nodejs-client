@@ -1,3 +1,6 @@
+// this script must be run via sudo for the i2c communication to work
+// example: sudo nodejs client.js
+
 // set up the websocket object
 const WebSocket = require('ws');
 // set up the rpio object
@@ -14,13 +17,10 @@ rpio.init({mapping: 'gpio'});
 
 // begin using i2c
 rpio.i2cBegin();
-// set address 0x04
+// set i2c address to 0x04
 rpio.i2cSetSlaveAddress(0x04);
 // set baudrate
 rpio.i2cSetBaudRate(9600);
-
-// open pin for control
-//rpio.open(2, rpio.OUTPUT, rpio.LOW);
 
 // create the channel JSON
 var channel_json = JSON.stringify({channel: 'DevicesChannel'});
@@ -63,13 +63,11 @@ ws.on('message', function(data, flags) {
 function handleDeviceMessage(message) {
   if (message.my_message === 'on') {
     console.log('on');
-    // turn pin 2 on
-    //rpio.write(2, rpio.HIGH);
+    // send '1' via i2c
     rpio.i2cWrite(new Buffer([0x01]));
   } else if (message.my_message === 'off') {
     console.log('off');
-    // turn pin 2 off
-    //rpio.write(2, rpio.LOW);
+    // send '2' via i2c
     rpio.i2cWrite(new Buffer([0x02]));
   }
 }
