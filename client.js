@@ -63,11 +63,11 @@ ws.on('message', function(data, flags) {
 function handleDeviceMessage(message) {
   if (message.my_message === 'on') {
     console.log('on');
-    // send '1' via i2c
-    rpio.i2cWrite(new Buffer([0x01]));
+    // send message via i2c
+    rpio.i2cWrite(new Buffer(message.my_message));
   } else if (message.my_message === 'off') {
     console.log('off');
-    // send '2' via i2c
-    rpio.i2cWrite(new Buffer([0x02]));
+    // send message via i2c
+    rpio.i2cWrite(new Buffer(message.my_message));
   }
 }
