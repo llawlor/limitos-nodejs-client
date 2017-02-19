@@ -61,13 +61,18 @@ ws.on('message', function(data, flags) {
 
 // handle a device message
 function handleDeviceMessage(message) {
-  if (message.my_message === 'on') {
+  if (message.value === 'on') {
     console.log('on');
     // send message via i2c
-    rpio.i2cWrite(new Buffer(message.my_message));
-  } else if (message.my_message === 'off') {
+    rpio.i2cWrite(new Buffer(message.value));
+  } else if (message.value === 'off') {
     console.log('off');
     // send message via i2c
-    rpio.i2cWrite(new Buffer(message.my_message));
+    rpio.i2cWrite(new Buffer(message.value));
+  // if there is a servo command
+  } else if (message.servo.length !== 0) {
+    console.log(message);
+    // send the servo command
+    rpio.i2cWrite(new Buffer("servo_" + message.servo));
   }
 }
