@@ -7,7 +7,8 @@ const WebSocket = require('ws');
 var rpio = require('rpio');
 
 // variable for the websocket, with the websocket server URL
-const ws = new WebSocket('ws://192.168.0.100:3000/cable');
+const ws = new WebSocket('wss://limitos.com/cable');
+//const ws = new WebSocket('ws://192.168.0.101:3000/cable');
  
 // enable i2c
 rpio.init({gpiomem: false});
@@ -61,18 +62,28 @@ ws.on('message', function(data, flags) {
 
 // handle a device message
 function handleDeviceMessage(message) {
+  // calculate the delay
+  var start_time = (new Date).getTime();
+  var delay = start_time - message.time;
+  var i2c_delay, log_message;
+
   if (message.value === 'on') {
-    console.log('on');
     // send message via i2c
     rpio.i2cWrite(new Buffer(message.value));
+    log_message = 'on';
   } else if (message.value === 'off') {
-    console.log('off');
     // send message via i2c
     rpio.i2cWrite(new Buffer(message.value));
+    log_message = 'off';
   // if there is a servo command
   } else if (message.servo.length !== 0) {
-    console.log(message);
     // send the servo command
-    rpio.i2cWrite(new Buffer("servo_" + message.servo));
+    rpio.i2cWrite(new Buffer("pin:" + message.pin + ",servo:" + message.servo));
+    log_message = "servo_" + message.servo;
   }
+
+  // set the i2c delay
+  i2c_delay = (new Date).getTime() - start_time;
+  console.log(log_message + ', ws delay: ' + delay + 'ms, i2c delay: ' + i2c_delay + 'ms');
+
 }
