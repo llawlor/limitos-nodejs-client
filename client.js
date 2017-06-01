@@ -67,19 +67,16 @@ function handleDeviceMessage(message) {
   var delay = start_time - message.time;
   var i2c_delay, log_message;
 
-  if (message.value === 'on') {
-    // send message via i2c
-    rpio.i2cWrite(new Buffer(message.value));
-    log_message = 'on';
-  } else if (message.value === 'off') {
-    // send message via i2c
-    rpio.i2cWrite(new Buffer(message.value));
-    log_message = 'off';
+  // if there is a digital output command
+  if (message.digital.length !== 0) {
+    // send the digital command
+    rpio.i2cWrite(new Buffer("pin:" + message.pin + ",digital:" + message.digital));
+    log_message = "digital_" + message.digital + ",pin_" + message.pin;
   // if there is a servo command
   } else if (message.servo.length !== 0) {
     // send the servo command
     rpio.i2cWrite(new Buffer("pin:" + message.pin + ",servo:" + message.servo));
-    log_message = "servo_" + message.servo;
+    log_message = "servo_" + message.servo + ",pin_" + message.pin;
   }
 
   // set the i2c delay
