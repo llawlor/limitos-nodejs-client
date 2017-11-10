@@ -7,8 +7,11 @@ const WebSocket = require('ws');
 var rpio = require('rpio');
 
 // variable for the websocket, with the websocket server URL
-const ws = new WebSocket('wss://limitos.com/cable');
-//const ws = new WebSocket('ws://192.168.0.101:3000/cable');
+//const ws = new WebSocket('wss://limitos.com/cable');
+const ws = new WebSocket('ws://192.168.0.101:3000/cable');
+
+// variable for the device ID
+var device_id = 1;
  
 // enable i2c
 rpio.init({gpiomem: false});
@@ -23,8 +26,10 @@ rpio.i2cSetSlaveAddress(0x04);
 // set baudrate
 rpio.i2cSetBaudRate(9600);
 
+
+
 // create the channel JSON
-var channel_json = JSON.stringify({channel: 'DevicesChannel'});
+var channel_json = JSON.stringify({channel: 'DevicesChannel', id: device_id});
 
 // when the websocket client connects to the server
 ws.on('open', function() {
@@ -42,7 +47,7 @@ ws.on('open', function() {
 ws.on('message', function(data, flags) {
   // get the JSON data
   var json_data = JSON.parse(data);
- 
+
   // if this is a ping command
   if (json_data.type === 'ping') {
     // log the ping message
